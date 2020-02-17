@@ -1,0 +1,15 @@
+.nav-tabs{
+    padding: 10px 0px 0px 10px;
+    background-color: #efefef;
+    border: 1px solid #dfdfdf;
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+}
+
+.tab-content {
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+    border-bottom: 1px solid #dfdfdf;
+    border-left: 1px solid #dfdfdf;
+    border-right: 1px solid #dfdfdf;
+}

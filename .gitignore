@@ -1,0 +1,43 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Pastas
+/frontend/app-vue
+
+# dependencies
+/backend/node_modules
+/backend/.pnp
+/backend/.pnp.js
+
+/frontend/app-react/node_modules
+/frontend/.pnp
+/frontend/.pnp.js
+
+# testing
+/backend/coverage
+/frontend/coverage
+
+# production
+/backend//build
+/frontend//build
+
+# misc
+# .DS_Store
+# .env.local
+# .env.development.local
+# .env.test.local
+# .env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# module.exports = {
+#     authSecret: 'abc',
+#     db: {
+#         host: '127.0.0.1',
+#         port: '5432',
+#         database: 'knowledge',
+#         user: 'postgres',
+#         password: '123456'
+#     }
+# }

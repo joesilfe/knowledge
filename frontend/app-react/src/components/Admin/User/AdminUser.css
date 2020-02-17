@@ -1,0 +1,11 @@
+.btn-toolbar > *+* {
+    margin-left: .5em;
+}
+
+.Toastify__toast--warning > .Toastify__toast-body {
+    color: #86711e;
+}
+
+span{
+    margin-left: 16px;
+}

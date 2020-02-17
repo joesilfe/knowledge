@@ -1,0 +1,14 @@
+.editor-articles{
+    background-color: #fff;
+    padding: 0 10px;
+    border: 1px solid #dfdfdf;
+    border-radius:4px;
+}
+
+.rdw-editor-toolbar {
+    border: 1px solid #dfdfdf !important;
+}
+
+.ql-editor{
+    background-color: #fff;
+}
