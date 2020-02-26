@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import './AdminArticles.css'
 
 import ReactQuill from 'react-quill'
@@ -13,59 +13,67 @@ import { Table, ButtonToolbar, Button, Form, Col } from 'react-bootstrap'
 import { baseApiUrl, showError } from './../../../global'
 import axios from 'axios'
 
-export default function AdminArticles() {
-
-    console.log('Limpar campo de conteúdo')
+function AdminArticles() {
     console.log('Fazer paginação')
+    console.log('Criar componente do select')
 
-    const [users, usersData] = useState([])
+    const [users, setUsersData] = useState([])
     const [categories, categoriesData] = useState([])
+    const [articles, articlesData] = useState([])
 
-    const [aData, articleData] = useState({})
-    const [articles, articlesData] = useState([])    
-
-    console.log(aData)
-
-    function loadUpdateArticle(date) {
-        document.querySelector('input[name="articles-name"]').value = date.nome
-        document.querySelector('input[name="articles-descricao"]').value = date.description
-        document.querySelector('input[name="articles-imageUrl"]').value = date.imageUrl
-        document.querySelector('.ql-editor').innerHTML = date.content
-    }
-
-    function updateArticle(id) {
-        const url = `${baseApiUrl}/articles/${id}`
-        return axios.get(url).then(res => {
-            loadUpdateArticle(res.data)
-        })
-            .catch(showError)
-    }
+    const [data, setData] = useState({})
+    const [articlesName, setArticlesName] = useState('')
+    const [description, setDescription] = useState('')
+    const [imageUrl, setImageUrl] = useState('')
+    const [content, setContent] = useState('')
+    const [categoryId, setCategoryId] = useState('')
+    const [userId, setUserId] = useState('')
 
     function loadArticles(page) {
         const url = page ? `${baseApiUrl}/articles?page=${page}` : `${baseApiUrl}/articles`
         return axios.get(url).then(res => articlesData(res.data))
     }
 
+    function dataArticle(categoria) {
+        setData({id: categoria.id, userId: categoria.userId})
+        setUserId(categoria.userId)
+        setCategoryId(categoria.categoryId)
+        setArticlesName(categoria.nome)
+        setDescription(categoria.description)
+        setImageUrl(categoria.imageUrl)
+        setContent(categoria.content)
+    }
+
+    function updateArticle(id) {
+        return axios.get(`${baseApiUrl}/articles/${id}`).then(res => {
+            dataArticle(res.data)
+        })
+            .catch(showError)
+    }
+    
     function loadCategories() {
         return axios.get(`${baseApiUrl}/categories`).then(res => categoriesData(res.data))
     }
 
     function loadUsers() {
-        return axios.get(`${baseApiUrl}/users`).then(res => usersData(res.data))
+        return axios.get(`${baseApiUrl}/users`).then(res => setUsersData(res.data))
     }
 
-    function save(e) {
+    function articleSave(e) {
         e.preventDefault()
 
-        const method = aData.id ? 'put' : 'post'
-        const urlId = aData.id ? `${aData.id}` : ''
-
-        if (aData.content !== undefined && aData.content !== "") {
-            axios[method](`${baseApiUrl}/articles/${urlId}`, aData)
+        if (content) {
+            axios.post(`${baseApiUrl}/articles/`, {
+                nome: articlesName,
+                description,
+                imageUrl,
+                content,
+                categoryId,
+                userId,
+            })
                 .then(() => {
                     success()
                     reset()
-                    document.location.reload(true);
                 })
                 .catch(showError)
         }
@@ -73,9 +81,30 @@ export default function AdminArticles() {
 
     }
 
-    function remove(id) {
-        const urlId = id
-        axios.delete(`${baseApiUrl}/articles/${urlId}`)
+    function articleUpdate(e) {
+        e.preventDefault()
+
+        if ( content && articlesName && description && categoryId && userId && data.id ) {
+            axios.put(`${baseApiUrl}/articles/${data.id}`, {
+                nome: articlesName,
+                description,
+                imageUrl,
+                content,
+                categoryId,
+                userId,
+            })
+                .then(() => {
+                    success()
+                    reset()
+                })
+                .catch(showError)
+        }
+        else { erro("Conteúdo não informado") }
+
+    }
+
+    function articleDelete(id) {
+        axios.delete(`${baseApiUrl}/articles/${id}`)
             .then(() => {
                 success()
                 reset()
@@ -85,12 +114,18 @@ export default function AdminArticles() {
 
     function reset(msg = "") {
         // limpar todos os campos
-        document.querySelectorAll('input').forEach(e => e.value = '')
-        document.querySelectorAll('select').forEach(e => e.value = '')
+        setArticlesName('')
+        setDescription('')
+        setCategoryId('')
+        setImageUrl('')
+        setContent('')
+        setUserId('')
+        setUserId('Selecione um autor')
+        setCategoryId('Selecione uma categoria')
 
         if (msg !== '') info(msg)
         loadArticles()
-        articleData({})
+        setData({})
     }
 
     // O useEffect entra em loop, basta passar como segundo parametro um array
@@ -105,24 +140,41 @@ export default function AdminArticles() {
     return (
         <div className="articles-admin">
             <Form>
-                <Form.Control type="hidden" id='articles-id' key={aData.id} value={aData.id} />
                 <Form.Row>
                     <Form.Group as={Col} md="12" sm="12" controlId="articles-name">
                         <Form.Label>Nome</Form.Label>
-                        <Form.Control type="text" name="articles-name" placeholder="Escreva o nominho do artigo" onChange={e => articleData({ ...aData, nome: e.target.value })} required />
+                        <Form.Control
+                            type="text"
+                            name="articles-name"
+                            placeholder="Escreva o nominho do artigo"
+                            value={articlesName}
+                            onChange={e => setArticlesName(e.target.value)}
+                            required />
                     </Form.Group>
-                    <Form.Group as={Col} md="12" sm="12" controlId="articles-descricao">
+                    <Form.Group as={Col} md="12" sm="12" controlId="articles-description">
                         <Form.Label>Descrição</Form.Label>
-                        <Form.Control type="text" name="articles-descricao" placeholder="Escreva uma descrição" onChange={e => articleData({ ...aData, description: e.target.value })} required />
+                        <Form.Control
+                            type="text"
+                            name="articles-description"
+                            placeholder="Escreva uma descrição"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                            required />
                     </Form.Group>
                     <Form.Group as={Col} md="12" sm="12" controlId="articles-imageUrl">
                         <Form.Label>Imagem(URL)</Form.Label>
-                        <Form.Control type="text" name="articles-imageUrl" placeholder="Copie e cole a URL da imagem" onChange={e => articleData({ ...aData, imageUrl: e.target.value })} required />
+                        <Form.Control
+                            type="text"
+                            name="articles-imageUrl"
+                            placeholder="Copie e cole a URL da imagem"
+                            value={imageUrl}
+                            onChange={e => setImageUrl(e.target.value)}
+                            required />
                     </Form.Group>
                     <Form.Group as={Col} md="6" sm="12" controlId="article-categorie-id">
                         <Form.Label>Categoria</Form.Label>
-                        <Form.Control as="select" onChange={e => articleData({ ...aData, categoryId: e.target.value })}>
-                            <option value=''>Selecione uma categoria</option>
+                        <Form.Control as="select" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
+                            <option value='Selecione uma categoria'>Selecione uma categoria</option>
                             {categories.map(categorie =>
                                 <option value={categorie.id} key={categorie.id}>{categorie.path}</option>
                             )}
@@ -130,8 +182,8 @@ export default function AdminArticles() {
                     </Form.Group>
                     <Form.Group as={Col} md="6" sm="12" controlId="user-article-id">
                         <Form.Label>Autor</Form.Label>
-                        <Form.Control as="select" onChange={e => articleData({ ...aData, userId: e.target.value })}>
-                            <option value=''>Selecione um autor</option>
+                        <Form.Control as="select" value={userId} onChange={e => setUserId(e.target.value)}>
+                            <option value='Selecione um autor'>Selecione um autor</option>
                             {users.map(user =>
                                 <option value={user.id} key={user.id}>{user.nome}</option>
                             )}
@@ -139,13 +191,29 @@ export default function AdminArticles() {
                     </Form.Group>
                     <Form.Group as={Col} md="12" sm="12" controlId="article-content">
                         <Form.Label>Conteúdo</Form.Label>
-                        <ReactQuill theme="snow"  onChange={ e => articleData({...aData, content: e}) } modules={modules} formats={formats} placeholder='Escreva o que está pensando' />
+                        <ReactQuill
+                            theme="snow"
+                            onChange={e => setContent(e)}
+                            modules={modules}
+                            formats={formats}
+                            value={content}
+                            placeholder='Escreva o que está pensando' />
                     </Form.Group>
                 </Form.Row>
                 <Form.Group>
-                    <Button variant="primary" type="submit" onClick={e => save(e)}>Salvar</Button>
-                    {/* <Button variant="danger" type="submit" >Excluir</Button> */}
-                    <Button variant="link" onClick={e => reset('Todos os campos estão limpos!')}>limpar</Button>
+                    <Button
+                        variant={data.userId ? "success" : "primary"}
+                        type="submit"
+                        onClick={data.userId ? e => articleUpdate(e) : e => articleSave(e)}
+                    >
+                        {data.userId ? "Atualizar" : "salvar"}
+                    </Button>
+                    <Button
+                        variant="link"
+                        onClick={() => reset('Todos os campos estão limpos!')}
+                    >
+                        {data.userId ? "Cancelar" : "Limpar"}
+                    </Button>
                 </ Form.Group>
             </Form>
             <Table striped hover>
@@ -166,7 +234,7 @@ export default function AdminArticles() {
                             <td key={article.id + 1}>
                                 <ButtonToolbar>
                                     <Button variant="warning" onClick={() => updateArticle(article.id)}><i className="fa fa-edit"></i></Button>
-                                    <Button variant="danger" onClick={() => remove(article.id)}><i className="fa fa-trash"></i></Button>
+                                    <Button variant="danger" onClick={() => articleDelete(article.id)}><i className="fa fa-trash"></i></Button>
                                 </ButtonToolbar>
                             </td>
                         </tr>
@@ -177,3 +245,5 @@ export default function AdminArticles() {
         </div>
     )
 }
+
+export default memo(AdminArticles)

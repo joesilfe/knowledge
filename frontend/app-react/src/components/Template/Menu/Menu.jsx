@@ -1,38 +1,39 @@
-import React, { useState, useEffect } from 'react'
+import React, { memo } from 'react'
 import './Menu.css'
 
+//remover
 import { useSelector } from 'react-redux'
 
-import { baseApiUrl } from './../../../global'
-import axios from 'axios'
+// import { baseApiUrl } from './../../../global'
+// import axios from 'axios'
 
-export default function Menu() {
-
-    const [search, setSearch] = useState({})
+ function Menu() {
 
     console.log('Criar arvore de categorias para navegar. https://material-ui.com/pt/components/tree-view/')
-    console.log(search)
 
     const show = useSelector(state => state)
 
-    console.log(show)
 
-    useEffect(() => {
-        async function getTreeData() {
-            const url = `${baseApiUrl}/categories/tree`
-            await axios.get(url).then(res =>
-                setSearch(res.data)
-            )
-        }
+    // const [search, setSearch] = useState([])
 
-        show.user.token && getTreeData()
-    }, [show.user.token])
+    // useEffect(() => {
+    //     async function getTreeData() {
+    //         const url = `${baseApiUrl}/categories/tree`
+    //         await axios.get(url).then(res =>
+    //             console.log(res.data)
+    //         )
+    //     }
+        
+    //     show.user.token && getTreeData()
+    // }, [show.user.token])
 
     return (
         <div>
-            {show.isVisible && <aside className="menu">outsite</aside>}
+            {show.isVisible &&
+                <aside className="menu">Aside</aside>}
         </ div>
-
     )
 }
+
+export default memo(Menu)
 

@@ -27,7 +27,6 @@ module.exports = app => {
                     .then(_ => res.status(204).send())
                     .catch(err => res.status(500).send(err))
             } else {
-                console.log('entrei no else')
                 app.db('categories')
                     .insert(category)
                     .then(_ => res.status(204).send())

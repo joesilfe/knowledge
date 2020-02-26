@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import './AdminUser.css'
 
 import { ToastContainer } from 'react-toastify';
@@ -10,7 +10,7 @@ import Switch from 'react-switch'
 import { baseApiUrl, showError } from './../../../global'
 import axios from 'axios'
 
-export default function UserCategory() {
+function UserCategory() {
 
     const [data, setData] = useState({}) // carrega dados de usuários
     const [users, setUsers] = useState([]) // carrega usuários sendo ativos e inativos
@@ -20,6 +20,10 @@ export default function UserCategory() {
     const [userAdmin, setUserAdmin] = useState(false)
     const [userPassword, setUserPassword] = useState('')
     const [userConfirmPassword, setUserConfirmPassword] = useState('')
+
+    //Galera fiz um novo exemplo de como usar react-tiger-transition, pacote pra transições completas de paginas com react-router, o que vocês acham?
+    //codigo: [https://pedrobern.github.io/react-tiger-transition/examples/basic?fbclid=IwAR3fVnpBgrKNyCJLk66hrBqWkuxyGVL64v0g5d_7ZrSPb-yjMrJx42BDhBc]
+    // (https://pedrobern.github.io/react-tiger-transition/examples/basic?fbclid=IwAR1IBIT1YfKDPtFVBGqlVyYi4H6XxdPgrNW5Gi3FCrN12ruYTVf1An2E3ws)
 
     // console.log('implementar YUP react na aplicação https://github.com/jquense/yup')
 
@@ -87,6 +91,7 @@ export default function UserCategory() {
 
         // limpa os dados de usuários
         setData({})
+        loadUsers()
     }
 
     function userEdit(userEdit) {
@@ -176,19 +181,13 @@ export default function UserCategory() {
                     }
                 </Form.Row>
                 <Form.Group>
-                    {data.status ?
-                        <Button
-                            variant="success"
-                            onClick={userUpdate} >
-                            Atualizar
+                    <Button
+                        variant={data.status ? "success" : "primary"}
+                        type="submit"
+                        onClick={data.status ? userUpdate : null}
+                    >
+                        {data.status ? "Atualizar" : "Salvar"}
                         </Button>
-                        :
-                        <Button
-                            variant="primary"
-                            type="submit">
-                            Salvar
-                        </Button>
-                    }
                     <Button
                         variant="link"
                         onClick={() => reset('Todos os campos estão limpos!')}>
@@ -204,7 +203,6 @@ export default function UserCategory() {
                                 id="user-inativo"
                                 label="Mostrar usuários inativos"
                                 className='mt-3 mb-3'
-                                chechked={true}
                                 onClick={e => loadUsers(e.target.checked)}
                             />
                         </Alert>
@@ -243,3 +241,5 @@ export default function UserCategory() {
         </div>
     )
 }
+
+export default memo(UserCategory)

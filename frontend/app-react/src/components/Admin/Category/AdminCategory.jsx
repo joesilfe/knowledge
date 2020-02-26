@@ -1,56 +1,32 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import './AdminCategory.css'
 
 import { ToastContainer } from 'react-toastify';
-import { success, info, erro } from './../../../config/msgs'
+import { success, info } from './../../../config/msgs'
 
 import { Table, ButtonToolbar, Button, Form, Col } from 'react-bootstrap'
 
 import { baseApiUrl, showError } from './../../../global'
 import axios from 'axios'
 
-export default function AdminCategorie() {
-    
-    console.log('O pai não pode ser filho do próprio filho')
-    
-    // const [mode, modeData] = useState('save')
-    const [cData, categorieData] = useState({})
-    const [categories, categoriesData] = useState([])
-    
-    
-    function loadCategorie(categorieEdit) {
-        document.querySelector('input[name="categorie-name"]').value = categorieEdit.name
-        categorieData({ ...categorieEdit })
-        
-    }
-    
-    
+function AdminCategorie() {
+
+    const [cData, setCData] = useState({})
+    const [categories, setCategories] = useState([])
+    const [categorieName, setCategorieName] = useState('')
+    const [categorieId, setCategorieId] = useState('...')
+
     async function loadCategories() {
-        await axios.get(`${baseApiUrl}/categories`).then(res => categoriesData(res.data))
+        await axios.get(`${baseApiUrl}/categories`).then(res => setCategories(res.data))
     }
 
-    function save(e) {
+    function categorieSave(e) {
         e.preventDefault()
-        
-        const method = cData.id ? 'put' : 'post'
-        const urlId = cData.id ? `${cData.id}` : ''        
-        cData.parentId = cData.parentId === '' ? cData.parentId = null : cData.parentId
 
-
-        parseInt(cData.id) === parseInt(cData.parentId) ? erro('Não é possível vincular em uma mesma categoria') :
-        
-        axios[method](`${baseApiUrl}/categories/${urlId}`, cData)
-        .then(() => {
-            success()
-            reset()
+        axios.post(`${baseApiUrl}/categories/`, {
+            name: categorieName,
+            parentId: categorieId === '...' ? null : categorieId
         })
-        .catch(showError)
-        
-    }
-
-    function remove(id) {
-        const urlId = id
-        axios.delete(`${baseApiUrl}/categories/${urlId}`)
             .then(() => {
                 success()
                 reset()
@@ -58,13 +34,42 @@ export default function AdminCategorie() {
             .catch(showError)
     }
 
-    function reset(msg = "") {
-        // limpar todos os campos
-        document.querySelector('input[name="categorie-name"]').value = ''        
-        document.querySelector("select#categorie-parentId").value = ' '
-        if(msg !== '') info(msg)
+    function setDataCategorie(categorie) {
+        setCData({ ...categorie })
+        setCategorieName(categorie.name)
+    }
+
+    function categorieUpdate(e) {
+        e.preventDefault()
+
+        axios.put(`${baseApiUrl}/categories/${cData.id}`, {
+            name: categorieName
+        })
+            .then(() => {
+                success()
+                reset()
+            })
+            .catch(showError)
+    }
+
+    function categorieDelete(id) {
+        axios.delete(`${baseApiUrl}/categories/${id}`)
+            .then(() => {
+                success()
+                reset()
+            })
+            .catch(showError)
+    }
+
+    async function reset(msg = "") {
+        if (msg !== '') info(msg)
+
         loadCategories()
-        categorieData({})
+        await setCData({})
+
+        // limpar todos os campos
+        setCategorieName('')
+        setCategorieId('...')
     }
 
     // O useEffect entra em loop, basta passar como segundo parametro um array
@@ -75,26 +80,50 @@ export default function AdminCategorie() {
     return (
         <div className="categorie-admin">
             <Form>
-                <Form.Control type="hidden" id='categorie-id' key={cData.id} value={cData.id} />
+                <Form.Control
+                    type="hidden"
+                    id='categorie-id'
+                    key={cData.id}
+                    value={cData.id} />
                 <Form.Row>
                     <Form.Group as={Col} md="12" sm="12" controlId="categorie-name">
                         <Form.Label>Nome</Form.Label>
-                        <Form.Control type="text" name="categorie-name" placeholder="Escreva o nominho da categoria" onChange={e => categorieData({ ...cData, name: e.target.value })} required />
+                        <Form.Control
+                            type="text"
+                            name="categorie-name"
+                            placeholder="Escreva o nominho da categoria"
+                            value={categorieName}
+                            onChange={e => setCategorieName(e.target.value)} required />
                     </Form.Group>
-                    <Form.Group as={Col} controlId="categorie-parentId">
-                        <Form.Label>Categoria Pai</Form.Label>
-                        <Form.Control as="select" onChange={e => categorieData({ ...cData, parentId: e.target.value})}>
-                            <option value=''>...</option>
-                            {categories.map(categorie =>
-                                <option value={categorie.id} key={categorie.id}>{categorie.path}</option>
-                            )}
-                        </Form.Control>
-                    </Form.Group>
+                    {cData.id ? null :
+                        <Form.Group as={Col} controlId="categorie-parentId">
+                            <Form.Label>Categoria Pai</Form.Label>
+                            <Form.Control as="select" value={categorieId} onChange={e => setCategorieId(e.target.value)}>
+                                <option value='...'>...</option>
+                                {categories.map(categorie =>
+                                    <option value={categorie.id} key={categorie.id}>
+                                        {categorie.path}
+                                    </option>
+                                )}
+                            </Form.Control>
+                        </Form.Group>
+                    }
                 </Form.Row>
                 <Form.Group>
-                    <Button variant="primary" type="submit" onClick={e => save(e)}>Salvar</Button>
-                    {/* <Button variant="danger" type="submit" >Excluir</Button> */}
-                    <Button variant="link" onClick={e => reset('Todos os campos estão limpos!')}>limpar</Button>
+                    <Button
+                        variant={cData.id ? "success" : "primary"}
+                        type="submit"
+                        onClick={cData.id ? e => categorieUpdate(e) : e => categorieSave(e)}
+                    >
+                        {cData.id ? 'Atualizar' : 'Salvar'}
+                    </Button>
+
+                    <Button
+                        variant="link"
+                        onClick={() => reset('Todos os campos estão limpos!')}
+                    >
+                        {cData.id ? 'Cancelar' : 'Limpar'}
+                    </Button>
                 </ Form.Group>
             </Form>
             <Table striped hover>
@@ -114,8 +143,8 @@ export default function AdminCategorie() {
                             <td key={categorie.path}>{categorie.path}</td>
                             <td key={categorie.id + 1}>
                                 <ButtonToolbar>
-                                    <Button variant="warning" onClick={() => loadCategorie(categorie)}><i className="fa fa-edit"></i></Button>
-                                    <Button variant="danger" onClick={() => remove(categorie.id)}><i className="fa fa-trash"></i></Button>
+                                    <Button variant="warning" onClick={() => setDataCategorie(categorie)}><i className="fa fa-edit"></i></Button>
+                                    <Button variant="danger" onClick={() => categorieDelete(categorie.id)}><i className="fa fa-trash"></i></Button>
                                 </ButtonToolbar>
                             </td>
                         </tr>
@@ -126,3 +155,5 @@ export default function AdminCategorie() {
         </div>
     )
 }
+
+export default memo(AdminCategorie)

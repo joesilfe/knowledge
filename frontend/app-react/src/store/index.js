@@ -4,7 +4,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const INICITAL_STATE = {
-    isVisible: false,
+    isVisible: true,
     user: {
         name: null,
         email: null

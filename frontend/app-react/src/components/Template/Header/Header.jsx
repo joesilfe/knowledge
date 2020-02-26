@@ -26,5 +26,5 @@ export default function Header(props) {
             {props.isVisibleMenu && <UserDropdown />}
         </header>
     )
-
 }
+
