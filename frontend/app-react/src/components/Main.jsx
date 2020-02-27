@@ -32,6 +32,8 @@ export default function Layout({ history }) {
             const json = localStorage.getItem(userKey)
             const userData = JSON.parse(json)
 
+            console.log(userData)
+
             dispatch({ type: 'SET_USER', user: { name: null, email: null } })
 
             if (!userData) {

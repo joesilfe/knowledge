@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Auth.css'
 
 import { ToastContainer } from 'react-toastify';
@@ -16,20 +16,20 @@ export default function Auth({ history }) {
     const [user, setUser] = useState({})
     const [showSignup, setShowSignup] = useState(false)
 
-    const dispatch = useDispatch()  
-    
+    const dispatch = useDispatch()
+
     function userLogin(user) {
         dispatch({ type: 'SET_USER', user: user })
     }
 
-    async function handleSubmit(event){
+    async function handleSubmit(event) {
         event.preventDefault()
 
-        await axios.post(`${baseApiUrl}/signin`, user).then(res =>{
+        await axios.post(`${baseApiUrl}/signin`, user).then(res => {
             userLogin(res.data)
-            localStorage.setItem(userKey, JSON.stringify(res.data))     
-            history.push('/home') 
-            console.log(history)           
+            localStorage.setItem(userKey, JSON.stringify(res.data))
+            history.push('/home')
+            console.log(history)
         }).catch(showError)
 
     }
@@ -48,6 +48,16 @@ export default function Auth({ history }) {
             })
             .catch(showError)
     }
+
+    useEffect(() => {
+        const json = localStorage.getItem(userKey)
+        const userData = JSON.parse(json)
+
+        if (userData) {
+            history.push('/home')
+            return
+        }
+    })
 
     return (
         <div className="auth-content">
