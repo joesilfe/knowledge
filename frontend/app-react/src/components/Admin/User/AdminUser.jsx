@@ -1,16 +1,17 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect } from 'react'
 import './AdminUser.css'
 
 import { ToastContainer } from 'react-toastify';
 import { success, info } from './../../../config/msgs'
 
-import { Table, ButtonToolbar, Button, Form, Col, Alert } from 'react-bootstrap'
+import { Table, Button, Form, Col, Alert } from 'react-bootstrap'
 import Switch from 'react-switch'
+import ItemUsers from './../../Template/Itens/ItemUsers'
 
 import { baseApiUrl, showError } from './../../../global'
 import axios from 'axios'
 
-function UserCategory() {
+export default function UserCategory() {
 
     const [data, setData] = useState({}) // carrega dados de usuários
     const [users, setUsers] = useState([]) // carrega usuários sendo ativos e inativos
@@ -26,6 +27,8 @@ function UserCategory() {
     // (https://pedrobern.github.io/react-tiger-transition/examples/basic?fbclid=IwAR1IBIT1YfKDPtFVBGqlVyYi4H6XxdPgrNW5Gi3FCrN12ruYTVf1An2E3ws)
 
     // console.log('implementar YUP react na aplicação https://github.com/jquense/yup')
+
+    // criar páginação
 
     function userSave(e) {
         e.preventDefault()
@@ -187,7 +190,7 @@ function UserCategory() {
                         onClick={data.status ? userUpdate : null}
                     >
                         {data.status ? "Atualizar" : "Salvar"}
-                        </Button>
+                    </Button>
                     <Button
                         variant="link"
                         onClick={() => reset('Todos os campos estão limpos!')}>
@@ -220,26 +223,19 @@ function UserCategory() {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user, index) =>
-                        <tr key={index}>
-                            <td key={user.id}>{index + 1}</td>
-                            <td key={user.nome}>{user.nome}</td>
-                            <td key={user.email}>{user.email}</td>
-                            <td key={user.admin}>{`${user.admin ? 'Sim' : 'Não'}`}</td>
-                            <td key={user.id + 1}>
-                                <ButtonToolbar>
-                                    {user.deletedAt && <Button variant="success" onClick={() => userEnable(user.id)}>Ativar</Button>}
-                                    {!user.deletedAt && <Button variant="warning" onClick={() => userEdit({ ...user, status: true })}><i className="fa fa-edit"></i></Button>}
-                                    {!user.deletedAt && <Button variant="danger" onClick={() => userDesable(user.id)}><i className="fa fa-trash"></i></Button>}
-                                </ButtonToolbar>
-                            </td>
-                        </tr>
-                    )}
+                    {users.map( (users, index) =>
+                        <ItemUsers
+                            user={users}
+                            index={index}
+                            key={index}
+                            userEnable={userEnable}
+                            userEdit={userEdit}
+                            userDesable={userDesable}
+                        />)
+                    }
                 </tbody>
             </Table>
             <ToastContainer />
         </div>
     )
 }
-
-export default memo(UserCategory)

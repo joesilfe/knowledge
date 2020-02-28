@@ -1,15 +1,19 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect } from 'react'
 import './AdminCategory.css'
 
 import { ToastContainer } from 'react-toastify';
 import { success, info } from './../../../config/msgs'
 
-import { Table, ButtonToolbar, Button, Form, Col } from 'react-bootstrap'
+import { Table, Button, Form, Col } from 'react-bootstrap'
+import ItemCategory from './../../Template/Itens/itemCategory'
 
 import { baseApiUrl, showError } from './../../../global'
 import axios from 'axios'
 
-function AdminCategorie() {
+export default function AdminCategorie() {
+
+    // criar páginação
+    console.log('categoria')
 
     const [cData, setCData] = useState({})
     const [categories, setCategories] = useState([])
@@ -137,23 +141,17 @@ function AdminCategorie() {
                 </thead>
                 <tbody>
                     {categories.map((categorie, index) =>
-                        <tr key={index}>
-                            <td key={categorie.id}>{index + 1}</td>
-                            <td key={(index + categorie.id) + (categorie.id + index + 1)}>{categorie.name}</td>
-                            <td key={categorie.path}>{categorie.path}</td>
-                            <td key={categorie.id + 1}>
-                                <ButtonToolbar>
-                                    <Button variant="warning" onClick={() => setDataCategorie(categorie)}><i className="fa fa-edit"></i></Button>
-                                    <Button variant="danger" onClick={() => categorieDelete(categorie.id)}><i className="fa fa-trash"></i></Button>
-                                </ButtonToolbar>
-                            </td>
-                        </tr>
-                    )}
+                        <ItemCategory
+                            categorie={categorie}
+                            index={index}
+                            key={index}
+                            setDataCategorie={setDataCategorie}
+                            categorieDelete={categorieDelete}
+                        />)
+                    }
                 </tbody>
             </Table>
             <ToastContainer />
         </div>
     )
 }
-
-export default memo(AdminCategorie)

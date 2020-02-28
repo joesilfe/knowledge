@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect } from 'react'
 import './AdminArticles.css'
 
 import ReactQuill from 'react-quill'
@@ -8,14 +8,16 @@ import { modules, formats } from '../../../config/quilljsConfig'
 import { ToastContainer } from 'react-toastify';
 import { success, info, erro } from './../../../config/msgs'
 
-import { Table, ButtonToolbar, Button, Form, Col } from 'react-bootstrap'
+import { Table, Button, Form, Col } from 'react-bootstrap'
+import ItemArticles from './../../Template/Itens/ItemArticles'
 
 import { baseApiUrl, showError } from './../../../global'
 import axios from 'axios'
 
-function AdminArticles() {
-    console.log('Fazer paginação')
-    console.log('Criar componente do select')
+export default function AdminArticles() {
+    //
+    // criar páginação
+    console.log('articles')
 
     const [users, setUsersData] = useState([])
     const [categories, categoriesData] = useState([])
@@ -35,7 +37,7 @@ function AdminArticles() {
     }
 
     function dataArticle(categoria) {
-        setData({id: categoria.id, userId: categoria.userId})
+        setData({ id: categoria.id, userId: categoria.userId })
         setUserId(categoria.userId)
         setCategoryId(categoria.categoryId)
         setArticlesName(categoria.nome)
@@ -50,7 +52,7 @@ function AdminArticles() {
         })
             .catch(showError)
     }
-    
+
     function loadCategories() {
         return axios.get(`${baseApiUrl}/categories`).then(res => categoriesData(res.data))
     }
@@ -84,7 +86,7 @@ function AdminArticles() {
     function articleUpdate(e) {
         e.preventDefault()
 
-        if ( content && articlesName && description && categoryId && userId && data.id ) {
+        if (content && articlesName && description && categoryId && userId && data.id) {
             axios.put(`${baseApiUrl}/articles/${data.id}`, {
                 nome: articlesName,
                 description,
@@ -226,24 +228,18 @@ function AdminArticles() {
                     </tr>
                 </thead>
                 <tbody>
-                    {articles.data ? articles.data.map((article, index) =>
-                        <tr key={index}>
-                            <td key={article.id}>{index + 1}</td>
-                            <td key={(index + article.id) + (article.id + index + 1)}>{article.nome}</td>
-                            <td key={article.path}>{article.description}</td>
-                            <td key={article.id + 1}>
-                                <ButtonToolbar>
-                                    <Button variant="warning" onClick={() => updateArticle(article.id)}><i className="fa fa-edit"></i></Button>
-                                    <Button variant="danger" onClick={() => articleDelete(article.id)}><i className="fa fa-trash"></i></Button>
-                                </ButtonToolbar>
-                            </td>
-                        </tr>
-                    ) : <tr><td></td></tr>}
+                    {articles.data && articles.data.map((article, index) =>
+                        <ItemArticles
+                            article={article}
+                            index={index}
+                            key={index}
+                            updateArticle={updateArticle}
+                            articleDelete={articleDelete}
+                        />)
+                    }
                 </tbody>
             </Table>
             <ToastContainer />
         </div>
     )
 }
-
-export default memo(AdminArticles)

@@ -10,5 +10,24 @@
 }
 
 .menu{
-    color: #ffffff
+    color: #ffffff;
+    padding: 20px;
+}
+
+.menu > ul, li {
+    margin-bottom: 15px;
+}
+
+a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.MuiTreeItem-root:focus, .MuiTreeItem-content {
+    background-color: rgba(0, 0, 0, 0.0) !important;
 }

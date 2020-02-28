@@ -29,7 +29,6 @@ export default function Auth({ history }) {
             userLogin(res.data)
             localStorage.setItem(userKey, JSON.stringify(res.data))
             history.push('/home')
-            console.log(history)
         }).catch(showError)
 
     }
