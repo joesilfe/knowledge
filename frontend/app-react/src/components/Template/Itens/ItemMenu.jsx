@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import TreeView from '@material-ui/lab/TreeView';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -6,16 +6,13 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 
 
-export default function MenuItem({ name, children }) {
+export default function MenuItem({ id, name, children }) {
     // const classes = useStyles();
-    const [expanded, setExpanded] = React.useState([]);
+    const [expanded, setExpanded] = useState([]);
 
     const handleChange = (event, nodes) => {
         setExpanded(nodes);
-        console.log(event)
-    };
-
-    console.log(children)
+    }
 
     return (
         <TreeView
@@ -25,11 +22,11 @@ export default function MenuItem({ name, children }) {
             expanded={expanded}
             onNodeToggle={handleChange}
         >
-            <Link>
+            <Link to={`/articlesByCategory/${id}/articles`}>
                 <TreeItem nodeId={name} label={name}>
                     {children && children.map((child, index) => <MenuItem {...child} key={index} />)}
                 </TreeItem>
-            </ Link>
+            </Link>
         </TreeView>
     )
 }

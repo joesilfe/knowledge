@@ -10,53 +10,66 @@ import ArticleItem from './../ArticleItem/ArticleItem'
 
 export default function ArticlesByCategory(props) {
 
-    console.log('analisar porque botão não está carregando outros artigos ou sumindo')
+    console.log('Fazer transição de navegação')
+    console.log('estudar possibilidade de implementar https://hasura.io/ ou https://www.prisma.io/')
 
-    // capturando o ID pela url
+    // capturando o ID que se encontra na url
     const { match } = props
 
-    const [page, setPage] = useState(1)
+    // const [page, setPage] = useState(1)
     const [loadMore, setLoadMore] = useState(true)
     const [category, setCategory] = useState({ id: parseInt(match.params.id) })
     const [articles, setArticles] = useState([])
+    const [cate, setCate] = useState([])
 
-    // console.log(category)
-    // console.log(articles)     
+    console.log(category, ' cateogry')
 
-    function getCategory() {
-        
+    async function getCategory() {
+        const url = `${baseApiUrl}/categories/${category.id}/articles?`
+        return await axios.get(url).then(res => {
+            if (res.data.length === articles.length) setLoadMore(false)
+            setArticles(res.data)
+        })
     }
 
-    const memoizedCallback = useCallback(() => {
-        const url = `${baseApiUrl}/categories/${category.id}`
-        return axios.get(url).then(res => setCategory(res.data))
-        },[category]
-    )
+    const getCategoryId = useCallback((id) => {
+        const url = `${baseApiUrl}/categories/${id}`
+        return axios.get(url).then(res => {
+            setCate(res.data)
+        })
+    }, [])
 
     useEffect(() => {
-         function getArticles() {
-            const url = `${baseApiUrl}/categories/${category.id}/articles?page=${page}`
-            return axios.get(url).then(res => {
+
+        if (category.id !== parseInt(match.params.id))
+            setCategory(parseInt(match.params.id))
+
+    }, [category, match.params.id])
+
+    useEffect(() => {
+
+        async function getAllArticles() {
+            const url = `${baseApiUrl}/categories/${category.id}/articles`
+            return await axios.get(url).then(res => {
                 setArticles(res.data)
-                setPage(+1)
-                if(res.data.length === 0) setLoadMore(false)
             })
-        } 
-        memoizedCallback()
-        getArticles()
-        getCategory()
-    }, [memoizedCallback, category.id, loadMore, page ])
+        }
+
+        if (category.id) getCategoryId(category.id)
+
+        getAllArticles()
+    }, [category, getCategoryId])
 
     return (
         <div className="articles-by-category">
-            <PageTitle icon="fa fa-folder-o" namePage={category.name} subtitle="Categoria" />
+            <PageTitle icon="fa fa-folder-o" namePage={cate.name} subtitle="Categoria" />
             <ul>
                 {articles.map((article, index) =>
-                    <li key={index}><ArticleItem article={article}/></li>
+                    <li key={index}><ArticleItem article={article} /></li>
                 )}
             </ul>
             <div className="load-more">
-                    { loadMore && <Button variant="primary" size="lg" onClick={() => getCategory()}>Carregar mais artigos</Button>}
+                {loadMore && <Button variant="primary" size="lg" onClick={() => getCategory()}>Carregar mais artigos</Button>}
             </div>
         </div>
     )

@@ -11,23 +11,26 @@
 
 .menu{
     color: #ffffff;
-    padding: 20px;
+    /* padding: 20px; */
 }
 
-.menu > ul, li {
+.MuiTreeItem-content{
+    padding: 10px;
+}
+
+/* .menu > ul, li {
     margin-bottom: 15px;
-}
+} */
 
-a {
+.MuiTreeView-root > a, .MuiTreeView-root > a:hover {
     text-decoration: none;
     color: #ffffff;
 }
 
-a:hover {
-    text-decoration: none;
-    color: #ffffff;
-}
-
-.MuiTreeItem-root:focus, .MuiTreeItem-content {
+.MuiTreeItem-content {
     background-color: rgba(0, 0, 0, 0.0) !important;
+}
+
+.MuiTreeItem-root:focus{
+    background-color: rgba(255, 255, 255, 0.2) !important;
 }

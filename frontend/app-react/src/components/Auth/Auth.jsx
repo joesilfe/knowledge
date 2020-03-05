@@ -11,7 +11,8 @@ import { useDispatch } from 'react-redux'
 
 import axios from 'axios'
 
-export default function Auth({ history }) {
+export default function Auth(props) {
+    console.log(props)
 
     const [user, setUser] = useState({})
     const [showSignup, setShowSignup] = useState(false)
@@ -28,7 +29,7 @@ export default function Auth({ history }) {
         await axios.post(`${baseApiUrl}/signin`, user).then(res => {
             userLogin(res.data)
             localStorage.setItem(userKey, JSON.stringify(res.data))
-            history.push('/home')
+            props.history.push('/home')
         }).catch(showError)
 
     }
@@ -53,7 +54,7 @@ export default function Auth({ history }) {
         const userData = JSON.parse(json)
 
         if (userData) {
-            history.push('/home')
+            props.history.push('/home')
             return
         }
     })

@@ -223,9 +223,9 @@ export default function UserCategory() {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map( (users, index) =>
+                    {users.map((user, index) =>
                         <ItemUsers
-                            user={users}
+                            user={user}
                             index={index}
                             key={index}
                             userEnable={userEnable}

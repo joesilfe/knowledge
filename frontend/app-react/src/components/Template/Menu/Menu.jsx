@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import './Menu.css'
 
-import MenuItem from './MenuItem'
+import MenuItem from './../Itens/ItemMenu'
 
 //remover
 import { useSelector } from 'react-redux'
@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux'
 import { baseApiUrl } from './../../../global'
 import axios from 'axios'
 
-function Menu() {
+function Menu(props) {
 
     console.log('Criar arvore de categorias para navegar. https://material-ui.com/pt/components/tree-view/')
 
@@ -32,7 +32,7 @@ function Menu() {
         <div>
             {show.isVisible &&
                 <aside className="menu">
-                    {search.map( (item, index) => <MenuItem {...item} key={index}/>)}
+                    {search.map( (item, index) => <MenuItem {...item} key={index} />)}
                 </aside>}
         </ div>
     )

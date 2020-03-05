@@ -7,27 +7,28 @@ import axios from 'axios'
 import PageTitle from '../../Template/PageTitle/PageTitle'
 
 export default function ArticleById(props) {
-    const {match} = props
+    const { match } = props
     const [article, setArticle] = useState({ id: parseInt(match.params.id) })
 
     console.log(match)
-    console.log(article)    
+    
+    function createMarkup() {
+        return { __html: article.content };
+    }
 
     useEffect(() => {
-        function loadByArticle() {
+        async function loadByArticle() {
             const url = `${baseApiUrl}/articles/${article.id}`
-            return axios.get(url).then(res => setArticle(res.data)) 
+            return await axios.get(url).then(res => setArticle(res.data))
         }
-        
+
         loadByArticle()
     }, [article.id])
 
-    return(
+    return (
         <div className="article-by-id">
-            <PageTitle icon="fa fa-file-o" namePage={article.nome} subtitle={article.description}/>
-            <div className="article-content">
-                {article.content}
-            </div>
+            <PageTitle icon="fa fa-file-o" namePage={article.nome} subtitle={article.description} />
+            <div className="article-content" dangerouslySetInnerHTML={createMarkup()} />
         </div>
     )
 }

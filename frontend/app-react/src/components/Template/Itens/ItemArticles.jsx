@@ -3,6 +3,7 @@ import React, { memo } from 'react';
 import { ButtonToolbar, Button } from 'react-bootstrap'
 
 function Itens({ article, index, updateArticle, articleDelete }) {
+    console.log(article)
     return (
         <tr>
             <td>{index + 1}</td>

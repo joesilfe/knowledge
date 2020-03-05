@@ -42,7 +42,7 @@ export default function UserDropdown() {
                     <i className="fa fa-chevron-down"></i>
                 </div>
                 <div className="user-dropdown-content">
-                    {show.user.admin ? <Link to="/admin"><i className="fa fa-cogs"></i>Administração</Link> : null}
+                    {show.user.admin && <Link to="/admin"><i className="fa fa-cogs"></i>Administração</Link>}
                     <Link to="/" onClick={handleSubmit}><i className="fa fa-sign-in"></i>Sair</Link>
                 </div>
             </div>
